@@ -1,0 +1,190 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Expense Tracker</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 30px 16px;
+      color: #222;
+    }
+
+    .app {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 24px;
+      border-radius: 16px;
+    }
+
+    h1 {
+      font-size: 26px;
+    }
+
+    .total {
+      background: #e4f5eb;
+      padding: 18px;
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+
+    .amount {
+      font-size: 30px;
+      font-weight: bold;
+      color: #167447;
+    }
+
+    input, button {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 12px;
+      margin: 6px 0;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    input {
+      border: 1px solid #ccc;
+    }
+
+    button {
+      border: none;
+      background: #167447;
+      color: white;
+      cursor: pointer;
+    }
+
+    .expense {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .delete {
+      width: auto;
+      background: #fce8e8;
+      color: #a52222;
+      padding: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <h1>My Expense Tracker</h1>
+    <p>Track your daily spending in RM.</p>
+
+    <section class="total">
+      <p>Total spending</p>
+      <div class="amount" id="total">RM 0.00</div>
+    </section>
+
+    <h2>Add an expense</h2>
+
+    <form id="expenseForm">
+      <input
+        id="description"
+        type="text"
+        placeholder="e.g. Lunch"
+        required
+      >
+
+      <input
+        id="amount"
+        type="number"
+        min="0.01"
+        step="0.01"
+        placeholder="Amount in RM"
+        required
+      >
+
+      <button type="submit">Add expense</button>
+    </form>
+
+    <h2>Recent expenses</h2>
+    <div id="expenseList">
+      <p>No expenses yet. Add your first one!</p>
+    </div>
+  </main>
+
+  <script>
+    const form = document.getElementById("expenseForm");
+    const descriptionInput =
+      document.getElementById("description");
+    const amountInput = document.getElementById("amount");
+    const totalDisplay = document.getElementById("total");
+    const expenseList = document.getElementById("expenseList");
+
+    let expenses = [];
+
+    function renderExpenses() {
+      const total = expenses.reduce(
+        (sum, expense) => sum + expense.amount,
+        0
+      );
+
+      totalDisplay.textContent =
+        "RM " + total.toFixed(2);
+
+      expenseList.replaceChildren();
+
+      if (expenses.length === 0) {
+        expenseList.textContent =
+          "No expenses yet. Add your first one!";
+        return;
+      }
+
+      expenses.forEach((expense, index) => {
+        const row = document.createElement("div");
+        row.className = "expense";
+
+        const details = document.createElement("span");
+        details.textContent = expense.description;
+
+        const price = document.createElement("strong");
+        price.textContent = "RM " + expense.amount.toFixed(2);
+
+        const deleteButton = document.createElement("button");
+        deleteButton.className = "delete";
+        deleteButton.textContent = "Delete";
+
+        deleteButton.addEventListener("click", () => {
+          expenses.splice(index, 1);
+          renderExpenses();
+        });
+
+        row.append(details, price, deleteButton);
+        expenseList.appendChild(row);
+      });
+    }
+
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const description = descriptionInput.value.trim();
+      const amount = Number(amountInput.value);
+
+      if (!description || !Number.isFinite(amount) || amount <= 0) {
+        return;
+      }
+
+      expenses.push({
+        description: description,
+        amount: amount
+      });
+
+      form.reset();
+      renderExpenses();
+    });
+  </script>
+</body>
+</html>
